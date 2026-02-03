@@ -59,6 +59,105 @@ PLUGIN_SCHEMAS = {
     }
 }
 
+# Configuration templates
+CONFIGURATION_TEMPLATES = {
+    'basic': {
+        'name': 'Basic Configuration',
+        'description': 'Simple single-endpoint configuration',
+        'config': {
+            'version': '1.0',
+            'port': 8888,
+            'endpoints': [
+                {
+                    'name': 'default',
+                    'url': 'http://localhost:8000/v1/chat/completions'
+                }
+            ]
+        }
+    },
+    'cached': {
+        'name': 'Cached Configuration',
+        'description': 'Configuration with semantic caching enabled',
+        'config': {
+            'version': '1.0',
+            'port': 8888,
+            'endpoints': [
+                {
+                    'name': 'default',
+                    'url': 'http://localhost:8000/v1/chat/completions'
+                }
+            ],
+            'plugins': [
+                {
+                    'type': 'semantic-cache',
+                    'configuration': {
+                        'enabled': True,
+                        'similarity_threshold': 0.92,
+                        'ttl_seconds': 3600
+                    }
+                }
+            ]
+        }
+    },
+    'secure': {
+        'name': 'Secure Configuration',
+        'description': 'Configuration with security plugins enabled',
+        'config': {
+            'version': '1.0',
+            'port': 8888,
+            'endpoints': [
+                {
+                    'name': 'default',
+                    'url': 'http://localhost:8000/v1/chat/completions'
+                }
+            ],
+            'plugins': [
+                {
+                    'type': 'jailbreak',
+                    'configuration': {
+                        'enabled': True,
+                        'threshold': 0.8
+                    }
+                },
+                {
+                    'type': 'pii',
+                    'configuration': {
+                        'enabled': True,
+                        'threshold': 0.7
+                    }
+                }
+            ]
+        }
+    },
+    'multi-model': {
+        'name': 'Multi-Model Configuration',
+        'description': 'Configuration with multiple model endpoints',
+        'config': {
+            'version': '1.0',
+            'port': 8888,
+            'endpoints': [
+                {
+                    'name': 'gpt4',
+                    'url': 'http://localhost:8001/v1/chat/completions'
+                },
+                {
+                    'name': 'gpt3',
+                    'url': 'http://localhost:8002/v1/chat/completions'
+                }
+            ],
+            'plugins': [
+                {
+                    'type': 'semantic-cache',
+                    'configuration': {
+                        'enabled': True,
+                        'similarity_threshold': 0.92
+                    }
+                }
+            ]
+        }
+    }
+}
+
 
 def validate_plugin(plugin: Dict[str, Any]) -> List[str]:
     """Validate a single plugin configuration."""
@@ -262,214 +361,17 @@ def validate():
 @app.route('/templates', methods=['GET'])
 def templates():
     """Get available configuration templates."""
-    templates_list = {
-        'basic': {
-            'name': 'Basic Configuration',
-            'description': 'Simple single-endpoint configuration',
-            'config': {
-                'version': '1.0',
-                'port': 8888,
-                'endpoints': [
-                    {
-                        'name': 'default',
-                        'url': 'http://localhost:8000/v1/chat/completions'
-                    }
-                ]
-            }
-        },
-        'cached': {
-            'name': 'Cached Configuration',
-            'description': 'Configuration with semantic caching enabled',
-            'config': {
-                'version': '1.0',
-                'port': 8888,
-                'endpoints': [
-                    {
-                        'name': 'default',
-                        'url': 'http://localhost:8000/v1/chat/completions'
-                    }
-                ],
-                'plugins': [
-                    {
-                        'type': 'semantic-cache',
-                        'configuration': {
-                            'enabled': True,
-                            'similarity_threshold': 0.92,
-                            'ttl_seconds': 3600
-                        }
-                    }
-                ]
-            }
-        },
-        'secure': {
-            'name': 'Secure Configuration',
-            'description': 'Configuration with security plugins enabled',
-            'config': {
-                'version': '1.0',
-                'port': 8888,
-                'endpoints': [
-                    {
-                        'name': 'default',
-                        'url': 'http://localhost:8000/v1/chat/completions'
-                    }
-                ],
-                'plugins': [
-                    {
-                        'type': 'jailbreak',
-                        'configuration': {
-                            'enabled': True,
-                            'threshold': 0.8
-                        }
-                    },
-                    {
-                        'type': 'pii',
-                        'configuration': {
-                            'enabled': True,
-                            'threshold': 0.7
-                        }
-                    }
-                ]
-            }
-        },
-        'multi-model': {
-            'name': 'Multi-Model Configuration',
-            'description': 'Configuration with multiple model endpoints',
-            'config': {
-                'version': '1.0',
-                'port': 8888,
-                'endpoints': [
-                    {
-                        'name': 'gpt4',
-                        'url': 'http://localhost:8001/v1/chat/completions'
-                    },
-                    {
-                        'name': 'gpt3',
-                        'url': 'http://localhost:8002/v1/chat/completions'
-                    }
-                ],
-                'plugins': [
-                    {
-                        'type': 'semantic-cache',
-                        'configuration': {
-                            'enabled': True,
-                            'similarity_threshold': 0.92
-                        }
-                    }
-                ]
-            }
-        }
-    }
-    
-    return jsonify(templates_list), 200
+    return jsonify(CONFIGURATION_TEMPLATES), 200
 
 
 @app.route('/templates/<template_name>', methods=['GET'])
 def get_template(template_name: str):
     """Get a specific configuration template."""
     try:
-        # Define templates inline
-        templates_list = {
-            'basic': {
-                'name': 'Basic Configuration',
-                'description': 'Simple single-endpoint configuration',
-                'config': {
-                    'version': '1.0',
-                    'port': 8888,
-                    'endpoints': [
-                        {
-                            'name': 'default',
-                            'url': 'http://localhost:8000/v1/chat/completions'
-                        }
-                    ]
-                }
-            },
-            'cached': {
-                'name': 'Cached Configuration',
-                'description': 'Configuration with semantic caching enabled',
-                'config': {
-                    'version': '1.0',
-                    'port': 8888,
-                    'endpoints': [
-                        {
-                            'name': 'default',
-                            'url': 'http://localhost:8000/v1/chat/completions'
-                        }
-                    ],
-                    'plugins': [
-                        {
-                            'type': 'semantic-cache',
-                            'configuration': {
-                                'enabled': True,
-                                'similarity_threshold': 0.92,
-                                'ttl_seconds': 3600
-                            }
-                        }
-                    ]
-                }
-            },
-            'secure': {
-                'name': 'Secure Configuration',
-                'description': 'Configuration with security plugins enabled',
-                'config': {
-                    'version': '1.0',
-                    'port': 8888,
-                    'endpoints': [
-                        {
-                            'name': 'default',
-                            'url': 'http://localhost:8000/v1/chat/completions'
-                        }
-                    ],
-                    'plugins': [
-                        {
-                            'type': 'jailbreak',
-                            'configuration': {
-                                'enabled': True,
-                                'threshold': 0.8
-                            }
-                        },
-                        {
-                            'type': 'pii',
-                            'configuration': {
-                                'enabled': True,
-                                'threshold': 0.7
-                            }
-                        }
-                    ]
-                }
-            },
-            'multi-model': {
-                'name': 'Multi-Model Configuration',
-                'description': 'Configuration with multiple model endpoints',
-                'config': {
-                    'version': '1.0',
-                    'port': 8888,
-                    'endpoints': [
-                        {
-                            'name': 'gpt4',
-                            'url': 'http://localhost:8001/v1/chat/completions'
-                        },
-                        {
-                            'name': 'gpt3',
-                            'url': 'http://localhost:8002/v1/chat/completions'
-                        }
-                    ],
-                    'plugins': [
-                        {
-                            'type': 'semantic-cache',
-                            'configuration': {
-                                'enabled': True,
-                                'similarity_threshold': 0.92
-                            }
-                        }
-                    ]
-                }
-            }
-        }
-        
-        if template_name not in templates_list:
+        if template_name not in CONFIGURATION_TEMPLATES:
             return jsonify({'error': f'Template "{template_name}" not found'}), 404
         
-        template = templates_list[template_name]
+        template = CONFIGURATION_TEMPLATES[template_name]
         config_yaml = generate_config(template['config'])
         
         return Response(config_yaml, mimetype='text/yaml'), 200
